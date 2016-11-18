@@ -53,6 +53,6 @@ aes128EncryptCBC iv k bs = fromRaw . S.concat. fmap toRaw . tailSafe $ pipeline
           blocks   = chunkEnc 16 . pkcs7 16 $ bs
 
 aes128DecryptCBC :: (Encoding e ByteString) => e ByteString -> Cipher (e ByteString)
-aes128DecryptCBC iv k bs = fromRaw . S.concat . fmap toRaw . tailSafe  $ pipeline
-    where pipeline = iv : [opRaw xor (aes128DecryptECB k $ a) b | a <- blocks | b <- pipeline]
+aes128DecryptCBC iv k bs = fromRaw . S.concat . fmap toRaw . fmap fst . tailSafe  $ pipeline
+    where pipeline = (fromRaw S.empty,iv) : [(opRaw xor (aes128DecryptECB k $ a) b, a) | a <- blocks | (_,b) <- pipeline]
           blocks   = chunkEnc 16 . pkcs7 16 $ bs
