@@ -42,7 +42,7 @@ aes128DecryptECB :: (Encoding e ByteString) => Cipher (e ByteString)
 aes128DecryptECB k = onRaw
     (AES.crypt' AES.ECB k (S.replicate 16 '\x00') AES.Decrypt)
 
---pkcs7 :: (Encoding e ByteString) => e ByteString -> e ByteString
---pkcs7 e = onRaw padTo16
---    where padTo16 b = flip S.cons b $ S.replicate (padLen b) (chr . padLen $ b)
---          padLen b  = S.length b `rem` 16
+pkcs7 :: (Encoding e ByteString) => Int -> e ByteString -> e ByteString
+pkcs7 n = onRaw pkcs7BS
+    where pkcs7BS b = let l = n - (S.length b `rem` n)
+            in S.append b $ S.replicate l (chr l)
