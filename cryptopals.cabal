@@ -1,0 +1,54 @@
+name:                cryptopals
+version:             0.1.0.0
+synopsis:            A classy solution to https://cryptopals.com/ using cabal testing
+-- description:         
+license:             BSD3
+license-file:        LICENSE
+author:              Ben Hamlin
+maintainer:          protob3n@gmail.com
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+
+library
+    -- Modules exported by the library.
+    exposed-modules:
+        Cryptopals
+    
+    -- Modules included in this library but not exported.
+    other-modules:       
+        Cryptopals.Statistics
+        Cryptopals.Cipher
+        Cryptopals.Cryptanalysis
+        Cryptopals.Util
+
+    -- LANGUAGE extensions used by all modules in this package.
+    --default-extensions:
+    
+    -- LANGUAGE extensions used by some modules in this package.
+    other-extensions:
+        NoImplicitPrelude,
+        OverloadedStrings
+    
+    -- Other library packages from which modules are imported.
+    build-depends:
+        base >=4.9 && <4.10,
+        protolude >=0.1 && <0.2,
+        bytestring >=0.10 && <0.11,
+        base64-bytestring >=1.0 && <1.1,
+        base16-bytestring >=0.1 && <0.2,
+        bits-bytestring >=0.1 && <0.2,
+        words >=0.1 && <0.2,
+        text >=1.2 && <1.3,
+        containers >=0.5 && <0.6,
+        async >=2.1 && <2.2,
+        AES >=0.2 && < 0.3
+    
+    -- Directories containing source files.
+    hs-source-dirs:      src
+    
+    -- Base language which the package is written in.
+    default-language:    Haskell2010
+
+-- vim: set tabstop=4 shiftwidth=4 softtabstop=4:
