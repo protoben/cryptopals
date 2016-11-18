@@ -1,7 +1,5 @@
 {-# LANGUAGE ParallelListComp #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
 module Cryptopals.Cipher where
 
 import Protolude
@@ -47,12 +45,18 @@ pkcs7BS n b = let l = (n - (S.length b `rem` n)) `rem` n
 pkcs7 :: (Encoding e ByteString) => Int -> e ByteString -> e ByteString
 pkcs7 n = onRaw $ pkcs7BS n
 
-aes128EncryptCBC :: (Encoding e ByteString) => e ByteString -> Cipher (e ByteString)
+aes128EncryptCBC :: (Encoding e ByteString) => ByteString -> Cipher (e ByteString)
 aes128EncryptCBC iv k bs = fromRaw . S.concat. fmap toRaw . tailSafe $ pipeline
-    where pipeline = iv : [aes128EncryptECB k (opRaw xor a b) | a <- blocks | b <- pipeline]
-          blocks   = chunkEnc 16 . pkcs7 16 $ bs
+    where blocks   = chunkEnc 16 . pkcs7 16 $ bs
+          pipeline = fromRaw iv : [ aes128EncryptECB k (a -^- b)
+                                  | a <- blocks
+                                  | b <- pipeline
+                                  ]
 
-aes128DecryptCBC :: (Encoding e ByteString) => e ByteString -> Cipher (e ByteString)
+aes128DecryptCBC :: (Encoding e ByteString) => ByteString -> Cipher (e ByteString)
 aes128DecryptCBC iv k bs = fromRaw . S.concat . fmap toRaw . fmap fst . tailSafe  $ pipeline
-    where pipeline = (fromRaw S.empty,iv) : [(opRaw xor (aes128DecryptECB k $ a) b, a) | a <- blocks | (_,b) <- pipeline]
-          blocks   = chunkEnc 16 . pkcs7 16 $ bs
+    where blocks   = chunkEnc 16 . pkcs7 16 $ bs
+          pipeline = (undefined, fromRaw iv) : [ (aes128DecryptECB k a -^- b, a)
+                                               | a     <- blocks
+                                               | (_,b) <- pipeline
+                                               ]

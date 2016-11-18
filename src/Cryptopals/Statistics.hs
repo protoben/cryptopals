@@ -1,8 +1,6 @@
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
 module Cryptopals.Statistics where
 
 import Protolude
@@ -125,9 +123,6 @@ rankString s = (/l) . sum . fmap rankChar . S.unpack $ bs
 
 bestString :: (Encoding e S.ByteString) => [e S.ByteString] -> e S.ByteString
 bestString = fst . maximumBy (comparing snd) . fmap (identity &&& rankString)
-
-instance Encoding e S.ByteString => Ord (e S.ByteString) where
-    a `compare` b = rankString b `compare` rankString a
 
 hammingDistance :: Bits e => e -> e -> Int
 hammingDistance e = popCount . xor e

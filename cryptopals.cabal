@@ -24,12 +24,12 @@ library
         Cryptopals.Util
 
     -- LANGUAGE extensions used by all modules in this package.
-    --default-extensions:
+    default-extensions:
+        OverloadedStrings
     
     -- LANGUAGE extensions used by some modules in this package.
     other-extensions:
         NoImplicitPrelude,
-        OverloadedStrings
     
     -- Other library packages from which modules are imported.
     build-depends:

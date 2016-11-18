@@ -1,10 +1,8 @@
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
 module Cryptopals.Encoding where
 
 import Protolude
@@ -14,11 +12,23 @@ import qualified Data.ByteString.Char8 as S
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Base16 as B16
 import Data.Bits.ByteString ()
-import Data.String (fromString)
 
 import Cryptopals.Util
 
-class Encoding e b where
+class Raw b where
+    toByteString :: b -> ByteString
+    fromByteString :: ByteString -> b
+    onByteString :: (ByteString -> ByteString) -> b -> b
+    onByteString f = fromByteString . f . toByteString
+    opByteString :: (ByteString -> ByteString -> ByteString) -> b -> b -> b
+    opByteString op e f = fromByteString $ toByteString e `op` toByteString f
+    {-# MINIMAL toByteString, fromByteString #-}
+
+instance Raw ByteString where
+    toByteString = identity
+    fromByteString = identity
+
+class Raw b => Encoding e b where
     toRaw :: e b -> b
     fromRaw :: b -> e b
     onRaw :: (b -> b) -> e b -> e b
@@ -27,30 +37,23 @@ class Encoding e b where
     opRaw op e f = fromRaw $ toRaw e `op` toRaw f
     convert :: Encoding f b => e b -> f b
     convert = fromRaw . toRaw
+    (-&-) :: e b -> e b -> e b
+    (-&-) = opByteString (.&.)
+    (-|-) :: e b -> e b -> e b
+    (-|-) = opByteString (.|.)
+    (-^-) :: e b -> e b -> e b
+    (-^-) = opByteString xor
+    oneBits :: Integral n => e b -> n
+    oneBits = fromIntegral . popCount . toByteString
     {-# MINIMAL toRaw, fromRaw #-}
-instance (Encoding e ByteString) => Eq (e ByteString) where
-    e == f = toRaw e == toRaw f
-instance (Encoding e ByteString) => IsString (e ByteString) where
-    fromString = fromRaw . S.pack
-instance (Encoding e ByteString) => Bits (e ByteString) where
-    (.&.) = opRaw (.&.)
-    (.|.) = opRaw (.|.)
-    xor = opRaw xor
-    complement = onRaw complement
-    rotate e n = onRaw (flip rotate n) e
-    shift e n = onRaw (flip shift n) e
-    bitSize = maybe 0 identity . bitSizeMaybe
-    bitSizeMaybe = bitSizeMaybe . toRaw
-    isSigned = isSigned . toRaw
-    bit = fromRaw . bit
-    popCount = popCount . toRaw
-    testBit = testBit . toRaw
-instance (Encoding e ByteString) => FiniteBits (e ByteString) where
-    finiteBitSize = finiteBitSize . toRaw
+instance (Encoding e b) => Raw (e b) where
+    toByteString = toByteString . toRaw
+    fromByteString = fromRaw . fromByteString
 
 data Ascii b = Ascii b
 deriving instance Show b => Show (Ascii b)
 deriving instance Read b => Read (Ascii b)
+deriving instance Eq b => Eq (Ascii b)
 instance Encoding Ascii ByteString where
     toRaw (Ascii bs) = bs
     fromRaw = Ascii
@@ -58,6 +61,7 @@ instance Encoding Ascii ByteString where
 data Hex b = Hex b
 deriving instance Show b => Show (Hex b)
 deriving instance Read b => Read (Hex b)
+deriving instance Eq b => Eq (Hex b)
 instance Encoding Hex ByteString where
     toRaw (Hex bs) = fst . B16.decode $ bs
     fromRaw = Hex . B16.encode
@@ -65,6 +69,7 @@ instance Encoding Hex ByteString where
 data Base64 b = Base64 b
 deriving instance Show b => Show (Base64 b)
 deriving instance Read b => Read (Base64 b)
+deriving instance Eq b => Eq (Base64 b)
 instance Encoding Base64 ByteString where
     toRaw (Base64 bs) = B64.decodeLenient bs
     fromRaw = Base64 . B64.encode
