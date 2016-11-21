@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ParallelListComp #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Cryptopals.Cipher where
@@ -17,6 +18,24 @@ printableBytes = ['\x20'..'\x7e']
 
 type Key = ByteString
 type KeySpace = [Key]
+
+data BlockSize = B128 | B192 | B256 deriving (Read, Show, Eq)
+
+blockbytes :: Integral n => BlockSize -> n
+blockbytes B128 = 16
+blockbytes B192 = 24
+blockbytes B256 = 32
+
+data IV = IV BlockSize ByteString deriving (Read, Show, Eq)
+
+iv :: Raw b => BlockSize -> b -> IV
+iv bs = IV bs . pkcs7BS (blockbytes bs) . toByteString
+
+zeroIv :: BlockSize -> IV
+zeroIv bs = IV bs $ S.replicate (blockbytes bs) '\x00'
+
+encodeIv :: Encoding e b => IV -> e b
+encodeIv (IV _ b) = fromByteString b
 
 type Cipher e = Key -> e -> e
 newtype CipherText a = CipherText a
@@ -45,18 +64,18 @@ pkcs7BS n b = let l = (n - (S.length b `rem` n)) `rem` n
 pkcs7 :: (Encoding e ByteString) => Int -> e ByteString -> e ByteString
 pkcs7 n = onRaw $ pkcs7BS n
 
-aes128EncryptCBC :: (Encoding e ByteString) => ByteString -> Cipher (e ByteString)
+aes128EncryptCBC :: (Encoding e ByteString) => IV -> Cipher (e ByteString)
 aes128EncryptCBC iv k bs = fromRaw . S.concat. fmap toRaw . tailSafe $ pipeline
     where blocks   = chunkEnc 16 . pkcs7 16 $ bs
-          pipeline = fromRaw iv : [ aes128EncryptECB k (a -^- b)
-                                  | a <- blocks
-                                  | b <- pipeline
-                                  ]
+          pipeline = encodeIv iv : [ aes128EncryptECB k (a -^- b)
+                                   | a <- blocks
+                                   | b <- pipeline
+                                   ]
 
-aes128DecryptCBC :: (Encoding e ByteString) => ByteString -> Cipher (e ByteString)
+aes128DecryptCBC :: (Encoding e ByteString) => IV -> Cipher (e ByteString)
 aes128DecryptCBC iv k bs = fromRaw . S.concat . fmap toRaw . fmap fst . tailSafe  $ pipeline
     where blocks   = chunkEnc 16 . pkcs7 16 $ bs
-          pipeline = (undefined, fromRaw iv) : [ (aes128DecryptECB k a -^- b, a)
-                                               | a     <- blocks
-                                               | (_,b) <- pipeline
-                                               ]
+          pipeline = (undefined, encodeIv iv) : [ (aes128DecryptECB k a -^- b, a)
+                                                | a     <- blocks
+                                                | (_,b) <- pipeline
+                                                ]

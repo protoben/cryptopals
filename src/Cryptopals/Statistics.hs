@@ -1,5 +1,4 @@
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Cryptopals.Statistics where
 
@@ -116,12 +115,12 @@ corpusRanks = foldr (uncurry Map.insert) emptyRanks
 rankChar :: Char -> Double
 rankChar = maybe 0 identity . (`Map.lookup` ranks)
 
-rankString :: (Encoding e S.ByteString) => e S.ByteString -> Double
+rankString :: (Encoding e ByteString) => e ByteString -> Double
 rankString s = (/l) . sum . fmap rankChar . S.unpack $ bs
     where l  = fromIntegral . S.length $ bs
           bs = toRaw s
 
-bestString :: (Encoding e S.ByteString) => [e S.ByteString] -> e S.ByteString
+bestString :: (Encoding e ByteString) => [e ByteString] -> e ByteString
 bestString = fst . maximumBy (comparing snd) . fmap (identity &&& rankString)
 
 hammingDistance :: Bits e => e -> e -> Int
