@@ -10,20 +10,24 @@ import qualified Data.Text as Text
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Control.Arrow ((&&&))
+import Data.Char (isPrint)
 
 import Cryptopals.Encoding
 
 type CharRanks = Map Char Double
 
 rankCharsByFreq :: Text -> CharRanks
-rankCharsByFreq = Text.foldr (Map.update $ Just . (+1)) emptyRanks
+rankCharsByFreq = Text.foldr (Map.update $ Just . (+1)) asciiRanks
+
+isAscii :: Char -> Bool
+isAscii c = isPrint c && ord c < 0x7f
 
 emptyRanks, asciiRanks, dictRanks, corpusRanks, ranks :: CharRanks
 emptyRanks  = Map.fromList $ zip ['\x00'..'\xff'] (repeat 0)
-asciiRanks  = foldr (uncurry Map.insert) emptyRanks $ zip ['\x7f'..'\xff'] (repeat (-9999))
+asciiRanks  = Map.mapWithKey (\k v -> if isAscii k then v else (-9999)) emptyRanks
 dictRanks   = rankCharsByFreq . Text.concat $ allWords
 ranks       = corpusRanks
-corpusRanks = foldr (uncurry Map.insert) emptyRanks
+corpusRanks = foldr (uncurry Map.insert) asciiRanks
     [ ('\n',1702.0)
     , ('\r',1702.0)
     , (' ',12387.0)

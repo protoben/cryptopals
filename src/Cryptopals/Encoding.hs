@@ -12,6 +12,7 @@ import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString.Char8 as S
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Base16 as B16
+import Network.Curl (URLString, curlGetString_)
 import Data.Bits.ByteString ()
 
 import Cryptopals.Util
@@ -38,18 +39,25 @@ class Raw b => Encoding e b where
     opRaw op e f = fromRaw $ toRaw e `op` toRaw f
     convert :: Encoding f b => e b -> f b
     convert = fromRaw . toRaw
-    (-&-) :: e b -> e b -> e b
-    (-&-) = opByteString (.&.)
-    (-|-) :: e b -> e b -> e b
-    (-|-) = opByteString (.|.)
-    (-^-) :: e b -> e b -> e b
-    (-^-) = opByteString xor
-    oneBits :: Integral n => e b -> n
-    oneBits = fromIntegral . popCount . toByteString
     {-# MINIMAL toRaw, fromRaw #-}
 instance (Encoding e b) => Raw (e b) where
     toByteString = toByteString . toRaw
     fromByteString = fromRaw . fromByteString
+
+infixl 7 -&-
+(-&-) :: Encoding e ByteString => e ByteString -> e ByteString -> e ByteString
+(-&-) = opRaw (.&.)
+
+infixl 5 -|-
+(-|-) :: Encoding e ByteString => e ByteString -> e ByteString -> e ByteString
+(-|-) = opRaw (.|.)
+
+infixl 6 -^-
+(-^-) :: Encoding e ByteString => e ByteString -> e ByteString -> e ByteString
+(-^-) = opRaw xor
+
+oneBits :: (Encoding e ByteString, Integral n) => e ByteString -> n
+oneBits = fromIntegral . popCount . toByteString
 
 data Ascii b = Ascii b
 deriving instance Show b => Show (Ascii b)
@@ -99,3 +107,9 @@ readBase64File = fmap (Base64 . S.concat . S.lines) . S.readFile
 
 readBase64Lines :: FilePath -> IO [Base64 ByteString]
 readBase64Lines = fmap (fmap Base64 . S.lines) . S.readFile
+
+curlBase64File :: URLString -> IO (Base64 ByteString)
+curlBase64File = fmap (Base64 . S.concat . S.lines . snd) . flip curlGetString_ []
+
+curlBase64Lines :: URLString -> IO [Base64 ByteString]
+curlBase64Lines = fmap (fmap Base64 . S.lines . snd) . flip curlGetString_ []

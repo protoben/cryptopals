@@ -21,18 +21,18 @@ type KeySpace = [Key]
 
 data BlockSize = B128 | B192 | B256 deriving (Read, Show, Eq)
 
-blockbytes :: Integral n => BlockSize -> n
-blockbytes B128 = 16
-blockbytes B192 = 24
-blockbytes B256 = 32
+blockBytes :: Integral n => BlockSize -> n
+blockBytes B128 = 16
+blockBytes B192 = 24
+blockBytes B256 = 32
 
 data IV = IV BlockSize ByteString deriving (Read, Show, Eq)
 
 iv :: Raw b => BlockSize -> b -> IV
-iv bs = IV bs . pkcs7BS (blockbytes bs) . toByteString
+iv bs = IV bs . pkcs7BS (blockBytes bs) . toByteString
 
 zeroIv :: BlockSize -> IV
-zeroIv bs = IV bs $ S.replicate (blockbytes bs) '\x00'
+zeroIv bs = IV bs $ S.replicate (blockBytes bs) '\x00'
 
 encodeIv :: Encoding e b => IV -> e b
 encodeIv (IV _ b) = fromByteString b
