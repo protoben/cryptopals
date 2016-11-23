@@ -43,6 +43,10 @@ bruteforceXor :: (Encoding e ByteString, Integral n)
               => n -> e ByteString -> Maybe (Key, e ByteString)
 bruteforceXor n = headMay . rankXorKeys n
 
+
+bestBruteforceXor :: Encoding e ByteString => [e ByteString] -> (Key, e ByteString)
+bestBruteforceXor = bestStringBy snd . catMaybes . fmap (bruteforceXor 1)
+
 possibly128ECB :: Encoding e ByteString => e ByteString -> Bool
 possibly128ECB = or . fmap (uncurry (==)) . choose2 . enumerate . toBlocks
     where toBlocks  = chunkDropBS 16 . toRaw

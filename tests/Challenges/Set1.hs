@@ -35,9 +35,9 @@ set1 = testGroup "Crypto challenge set 1"
         @=? Just ("X", Ascii "Cooking MC's like a pound of bacon")
 
     , testCase "Challenge 4 - Detect single-character XOR" $ do
-        cts <- curlBase64Lines "https://cryptopals.com/static/challenge-data/4.txt"
-        assert $ S.all isAscii . toRaw . bestString . fmap snd . catMaybes
-               . fmap (bruteforceXor 1) $ cts
+        cts <- curlHexLines "https://cryptopals.com/static/challenge-data/4.txt"
+        (second ascii $ bestBruteforceXor cts)
+            @=? ("5", Ascii "Now that the party is jumping\n")
 
     , testCase "Challenge 5 - Implement repeating-key XOR" $
         xorCipher "ICE" (hex . Ascii . S.concat $

@@ -124,8 +124,11 @@ rankString s = (/l) . sum . fmap rankChar . S.unpack $ bs
     where l  = fromIntegral . S.length $ bs
           bs = toRaw s
 
+bestStringBy :: (Encoding e ByteString) => (a -> e ByteString) -> [a] -> a
+bestStringBy f = fst . maximumBy (comparing snd) . fmap (identity &&& rankString . f)
+
 bestString :: (Encoding e ByteString) => [e ByteString] -> e ByteString
-bestString = fst . maximumBy (comparing snd) . fmap (identity &&& rankString)
+bestString = bestStringBy identity
 
 hammingDistance :: Bits e => e -> e -> Int
 hammingDistance e = popCount . xor e

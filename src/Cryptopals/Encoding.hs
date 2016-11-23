@@ -57,7 +57,10 @@ infixl 6 -^-
 (-^-) = opRaw xor
 
 oneBits :: (Encoding e ByteString, Integral n) => e ByteString -> n
-oneBits = fromIntegral . popCount . toByteString
+oneBits = fromIntegral . popCount . toRaw
+
+bitSize :: (Encoding e ByteString, Integral n) => e ByteString -> n
+bitSize = fromIntegral . finiteBitSize . toRaw
 
 data Ascii b = Ascii b
 deriving instance Show b => Show (Ascii b)
@@ -108,8 +111,14 @@ readBase64File = fmap (Base64 . S.concat . S.lines) . S.readFile
 readBase64Lines :: FilePath -> IO [Base64 ByteString]
 readBase64Lines = fmap (fmap Base64 . S.lines) . S.readFile
 
+readHexLines :: FilePath -> IO [Hex ByteString]
+readHexLines = fmap (fmap Hex . S.lines) . S.readFile
+
 curlBase64File :: URLString -> IO (Base64 ByteString)
 curlBase64File = fmap (Base64 . S.concat . S.lines . snd) . flip curlGetString_ []
 
 curlBase64Lines :: URLString -> IO [Base64 ByteString]
 curlBase64Lines = fmap (fmap Base64 . S.lines . snd) . flip curlGetString_ []
+
+curlHexLines :: URLString -> IO [Hex ByteString]
+curlHexLines = fmap (fmap Hex . S.lines . snd) . flip curlGetString_ []
