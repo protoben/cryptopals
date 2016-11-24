@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Challenges.Set7 where
+module Main where
 
 import Protolude
 
@@ -8,7 +8,10 @@ import Test.Tasty.HUnit
 
 import Cryptopals
 
+main :: IO ()
+main = defaultMain set7
+
 set7 :: TestTree
-set7 = testGroup "Crypto challenge set 7"
+set7 = testGroup "Cryptopals crypto challenges - Set 7"
     [ testCase "Set 7" $ assertFailure "No tests implemented"
     ]

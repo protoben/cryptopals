@@ -6,39 +6,64 @@ language: c
 
 # Caching so the next build will be fast too.
 cache:
-    directories:
-    - $HOME/.ghc
-    - $HOME/.cabal
-    - $HOME/.stack
+  directories:
+  - $HOME/.ghc
+  - $HOME/.cabal
+  - $HOME/.stack
 
 matrix:
-    include:
-    - env: BUILD=stack TEST="cryptopals:challenges-set1"
-      compiler: ": set 1"
-      addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
+  include:
+  - env: BUILD=stack TEST="cryptopals:challenges-set1"
+    compiler: ": Set 1"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
 
-    #allow_failures:
-    #- env: BUILD=stack ARGS="--resolver nightly"
+  allow_failures:
+  - env: BUILD=stack TEST="cryptopals:challenges-set2"
+    compiler: ": Set 2"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
+  - env: BUILD=stack TEST="cryptopals:challenges-set3"
+    compiler: ": Set 3"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
+  - env: BUILD=stack TEST="cryptopals:challenges-set4"
+    compiler: ": Set 4"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
+  - env: BUILD=stack TEST="cryptopals:challenges-set5"
+    compiler: ": Set 5"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
+  - env: BUILD=stack TEST="cryptopals:challenges-set6"
+    compiler: ": Set 6"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
+  - env: BUILD=stack TEST="cryptopals:challenges-set7"
+    compiler: ": Set 7"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
+  - env: BUILD=stack TEST="cryptopals:challenges-set8"
+    compiler: ": Set 8"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
 
 before_install:
 # Using compiler above sets CC to an invalid value, so unset it
 - unset CC
 
 # Download and unpack the stack executable
-- export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$HOME/.local/bin:/opt/alex/$ALEXVER/bin:/opt/happy/$HAPPYVER/bin:$HOME/.cabal/bin:$PATH
+- |
+  PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$HOME/.local/bin:$PATH
+  PATH=/opt/alex/$ALEXVER/bin:/opt/happy/$HAPPYVER/bin:$HOME/.cabal/bin:$PATH
+  export PATH
 - mkdir -p ~/.local/bin
 - |
-    travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+  travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 \
+    | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
-    # Use the more reliable S3 mirror of Hackage
-    mkdir -p $HOME/.cabal
-    echo 'remote-repo: hackage.haskell.org:http://hackage.fpcomplete.com/' > $HOME/.cabal/config
-    echo 'remote-repo-cache: $HOME/.cabal/packages' >> $HOME/.cabal/config
+  # Use the more reliable S3 mirror of Hackage
+  mkdir -p $HOME/.cabal
+  echo 'remote-repo: hackage.haskell.org:http://hackage.fpcomplete.com/' \
+    > $HOME/.cabal/config
+  echo 'remote-repo-cache: $HOME/.cabal/packages' >> $HOME/.cabal/config
 
-    if [ "$CABALVER" != "1.16" ]
-    then
-        echo 'jobs: $ncpus' >> $HOME/.cabal/config
-    fi
+  if [ "$CABALVER" != "1.16" ]
+  then
+    echo 'jobs: $ncpus' >> $HOME/.cabal/config
+  fi
 
 # Get the list of packages from the stack.yaml file
 - PACKAGES=$(stack --install-ghc query locals | grep '^ *path' | sed 's@^ *path:@@')
@@ -48,4 +73,6 @@ install:
 - stack --no-terminal --install-ghc test --bench --only-dependencies
 
 script:
-- stack --no-terminal build --test $TEST --bench --no-run-benchmarks --haddock --no-haddock-deps --test-arguments -j4
+- >
+  stack --no-terminal build --test $TEST --bench --no-run-benchmarks
+  --haddock --no-haddock-deps --test-arguments -j4

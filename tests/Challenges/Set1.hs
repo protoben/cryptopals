@@ -13,7 +13,7 @@ main :: IO ()
 main = defaultMain set1
 
 set1 :: TestTree
-set1 = testGroup "Cryptopals crypto challenges set 1"
+set1 = testGroup "Cryptopals crypto challenges - Set 1"
     [ testCase  "Challenge 1 - Convert hex to base64" $
         base64 (Hex $ S.concat
             [ "49276d206b696c6c696e6720796f7572"
