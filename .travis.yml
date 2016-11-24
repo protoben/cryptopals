@@ -12,24 +12,31 @@ cache:
   - $HOME/.stack
 
 matrix:
-  compiler:
-  - "ghc-7.10.3"
-
-  addons:
-  - apt:
-      packages:
-      - ghc-7.10.3
-      sources:
-      - hvr-ghc
-
   include:
   - env: TEST="cryptopals:challenges-set1"
+    compiler: ": Set 1"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
   - env: TEST="cryptopals:challenges-set2"
+    compiler: ": Set 2"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
+  - env: TEST="cryptopals:challenges-set3"
+    compiler: ": Set 3"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
   - env: TEST="cryptopals:challenges-set4"
+    compiler: ": Set 4"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
   - env: TEST="cryptopals:challenges-set5"
+    compiler: ": Set 5"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
   - env: TEST="cryptopals:challenges-set6"
+    compiler: ": Set 6"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
   - env: TEST="cryptopals:challenges-set7"
+    compiler: ": Set 7"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
   - env: TEST="cryptopals:challenges-set8"
+    compiler: ": Set 8"
+    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
 
   allow_failures:
   - env: TEST="cryptopals:challenges-set2"
