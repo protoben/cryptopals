@@ -12,40 +12,34 @@ cache:
   - $HOME/.stack
 
 matrix:
-  include:
-  - env: BUILD=stack TEST="cryptopals:challenges-set1"
-    compiler: ": Set 1"
-    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
-  - env: BUILD=stack TEST="cryptopals:challenges-set2"
-    compiler: ": Set 2"
-    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
-  - env: BUILD=stack TEST="cryptopals:challenges-set3"
-    compiler: ": Set 3"
-    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
-  - env: BUILD=stack TEST="cryptopals:challenges-set4"
-    compiler: ": Set 4"
-    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
-  - env: BUILD=stack TEST="cryptopals:challenges-set5"
-    compiler: ": Set 5"
-    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
-  - env: BUILD=stack TEST="cryptopals:challenges-set6"
-    compiler: ": Set 6"
-    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
-  - env: BUILD=stack TEST="cryptopals:challenges-set7"
-    compiler: ": Set 7"
-    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
-  - env: BUILD=stack TEST="cryptopals:challenges-set8"
-    compiler: ": Set 8"
-    addons: {apt: {packages: [ghc-7.10.3], sources: [hvr-ghc]}}
+  compiler:
+  - "ghc-7.10.3"
+
+  env:
+  - TEST="cryptopals:challenges-set1"
+  - TEST="cryptopals:challenges-set2"
+  - TEST="cryptopals:challenges-set3"
+  - TEST="cryptopals:challenges-set4"
+  - TEST="cryptopals:challenges-set5"
+  - TEST="cryptopals:challenges-set6"
+  - TEST="cryptopals:challenges-set7"
+  - TEST="cryptopals:challenges-set8"
+
+  addons:
+  - apt:
+      packages:
+      - ghc-7.10.3
+      sources:
+      - hvr-ghc
 
   allow_failures:
-  - env: BUILD=stack TEST="cryptopals:challenges-set2"
-  - env: BUILD=stack TEST="cryptopals:challenges-set3"
-  - env: BUILD=stack TEST="cryptopals:challenges-set4"
-  - env: BUILD=stack TEST="cryptopals:challenges-set5"
-  - env: BUILD=stack TEST="cryptopals:challenges-set6"
-  - env: BUILD=stack TEST="cryptopals:challenges-set7"
-  - env: BUILD=stack TEST="cryptopals:challenges-set8"
+  - env: TEST="cryptopals:challenges-set2"
+  - env: TEST="cryptopals:challenges-set3"
+  - env: TEST="cryptopals:challenges-set4"
+  - env: TEST="cryptopals:challenges-set5"
+  - env: TEST="cryptopals:challenges-set6"
+  - env: TEST="cryptopals:challenges-set7"
+  - env: TEST="cryptopals:challenges-set8"
 
 before_install:
 # Using compiler above sets CC to an invalid value, so unset it
