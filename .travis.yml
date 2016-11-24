@@ -14,13 +14,6 @@ cache:
 compiler:
 - "ghc-7.10.3"
 
-addons:
-  apt:
-    packages:
-    - ghc-7.10.3
-    sources:
-    - hvr-ghc
-
 env:
 - TEST="cryptopals:challenges-set1"
 - TEST="cryptopals:challenges-set2"
@@ -68,6 +61,9 @@ before_install:
 
 # Get the list of packages from the stack.yaml file
 - PACKAGES=$(stack --install-ghc query locals | grep '^ *path' | sed 's@^ *path:@@')
+
+# Make sure we have the right GHC version
+- stack --resolver "$CC" setup
 
 install:
 - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
