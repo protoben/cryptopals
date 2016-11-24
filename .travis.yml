@@ -4,7 +4,6 @@ sudo: false
 # Choose a lightweight base image; we provide our own build tools.
 language: c
 
-# Caching so the next build will be fast too.
 cache:
   directories:
   - $HOME/.ghc
@@ -50,25 +49,8 @@ before_install:
   travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 \
     | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
-  # Use the more reliable S3 mirror of Hackage
-  mkdir -p $HOME/.cabal
-  echo 'remote-repo: hackage.haskell.org:http://hackage.fpcomplete.com/' \
-    > $HOME/.cabal/config
-  echo 'remote-repo-cache: $HOME/.cabal/packages' >> $HOME/.cabal/config
-
-  if [ "$CABALVER" != "1.16" ]
-  then
-    echo 'jobs: $ncpus' >> $HOME/.cabal/config
-  fi
-
-# Get the list of packages from the stack.yaml file
-- PACKAGES=$(stack --install-ghc query locals | grep '^ *path' | sed 's@^ *path:@@')
-
 # Make sure we have the right GHC version
 - stack --resolver "$CC" setup
-
-# Using compiler above sets CC to an invalid value, so unset it
-- unset CC
 
 install:
 - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
