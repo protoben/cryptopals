@@ -15,22 +15,21 @@ matrix:
   compiler:
   - "ghc-7.10.3"
 
-  env:
-  - TEST="cryptopals:challenges-set1"
-  - TEST="cryptopals:challenges-set2"
-  - TEST="cryptopals:challenges-set3"
-  - TEST="cryptopals:challenges-set4"
-  - TEST="cryptopals:challenges-set5"
-  - TEST="cryptopals:challenges-set6"
-  - TEST="cryptopals:challenges-set7"
-  - TEST="cryptopals:challenges-set8"
-
   addons:
   - apt:
       packages:
       - ghc-7.10.3
       sources:
       - hvr-ghc
+
+  include:
+  - env: TEST="cryptopals:challenges-set1"
+  - env: TEST="cryptopals:challenges-set2"
+  - env: TEST="cryptopals:challenges-set4"
+  - env: TEST="cryptopals:challenges-set5"
+  - env: TEST="cryptopals:challenges-set6"
+  - env: TEST="cryptopals:challenges-set7"
+  - env: TEST="cryptopals:challenges-set8"
 
   allow_failures:
   - env: TEST="cryptopals:challenges-set2"
