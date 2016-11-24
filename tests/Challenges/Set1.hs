@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Challenges.Set1 where
+module Main where
 
 import Protolude
 
@@ -9,8 +9,11 @@ import qualified Data.ByteString.Char8 as S
 
 import Cryptopals
 
+main :: IO ()
+main = defaultMain set1
+
 set1 :: TestTree
-set1 = testGroup "Crypto challenge set 1"
+set1 = testGroup "Cryptopals crypto challenges set 1"
     [ testCase  "Challenge 1 - Convert hex to base64" $
         base64 (Hex $ S.concat
             [ "49276d206b696c6c696e6720796f7572"

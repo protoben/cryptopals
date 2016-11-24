@@ -55,12 +55,12 @@ library
     -- Base language which the package is written in.
     default-language:    Haskell2010
 
-test-suite challenges
+test-suite challenges-set1
     default-language:   Haskell2010
     type:               exitcode-stdio-1.0
     ghc-options:        -threaded
-    hs-source-dirs:     tests
-    main-is:            Challenges.hs
+    hs-source-dirs:     tests/Challenges
+    main-is:            Set1.hs
     build-depends:
         base >=4.9 && <4.10,
         protolude >=0.1 && <0.2,
