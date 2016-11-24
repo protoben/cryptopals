@@ -21,17 +21,17 @@ addons:
     sources:
     - hvr-ghc
 
-matrix:
-  include:
-  - env: TEST="cryptopals:challenges-set1"
-  - env: TEST="cryptopals:challenges-set2"
-  - env: TEST="cryptopals:challenges-set3"
-  - env: TEST="cryptopals:challenges-set4"
-  - env: TEST="cryptopals:challenges-set5"
-  - env: TEST="cryptopals:challenges-set6"
-  - env: TEST="cryptopals:challenges-set7"
-  - env: TEST="cryptopals:challenges-set8"
+env:
+- TEST="cryptopals:challenges-set1"
+- TEST="cryptopals:challenges-set2"
+- TEST="cryptopals:challenges-set3"
+- TEST="cryptopals:challenges-set4"
+- TEST="cryptopals:challenges-set5"
+- TEST="cryptopals:challenges-set6"
+- TEST="cryptopals:challenges-set7"
+- TEST="cryptopals:challenges-set8"
 
+matrix:
   allow_failures:
   - env: TEST="cryptopals:challenges-set2"
   - env: TEST="cryptopals:challenges-set3"
