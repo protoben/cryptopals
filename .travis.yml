@@ -11,6 +11,11 @@ cache:
   - $HOME/.cabal
   - $HOME/.stack
 
+addons:
+  apt:
+    packages:
+      - libgmp3-dev
+
 compiler:
 - "ghc-7.10.3"
 
