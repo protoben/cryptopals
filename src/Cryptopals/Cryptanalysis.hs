@@ -122,4 +122,3 @@ findBlockSize o = msum $ blockSize . ctSizeDiff <$> [1..]
     blockSize 32 = Just B256
     blockSize  _ = Nothing
 
---findOracleSuffix
