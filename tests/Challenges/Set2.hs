@@ -31,13 +31,13 @@ set2 = testGroup "Cryptopals crypto challenges - Set 2"
         step "Detect ECB"
         let mode = Just ECB
         oECB <- randomAesOracle mode (Just B128) Nothing Nothing Nothing <$> newStdGen
-             :: IO (EncryptionOracle (Base64 ByteString))
+             :: IO (EncryptionOracle Base64)
         isProbablyCBC B128 oECB
             @?= False
         step "Detect CBC"
         let mode = Just $ CBC (zeroIv B128)
         oCBC <- randomAesOracle mode (Just B128) Nothing Nothing Nothing <$> newStdGen
-             :: IO (EncryptionOracle (Base64 ByteString))
+             :: IO (EncryptionOracle Base64)
         isProbablyCBC B128 oCBC
             @?= True
 
@@ -60,7 +60,7 @@ set2 = testGroup "Cryptopals crypto challenges - Set 2"
 
     ]
 
-vanillaIcePlayThatFunkyMusic :: Ascii ByteString
+vanillaIcePlayThatFunkyMusic :: Ascii
 vanillaIcePlayThatFunkyMusic = Ascii $ S.concat
     [ "I'm back and I'm ringin' the bell \n"
     , "A rockin' on the mike while the fly girls yell \n"

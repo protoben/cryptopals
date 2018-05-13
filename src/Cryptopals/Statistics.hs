@@ -119,15 +119,15 @@ corpusRanks = foldr (uncurry Map.insert) asciiRanks
 rankChar :: Char -> Double
 rankChar = maybe 0 identity . (`Map.lookup` ranks)
 
-rankString :: (Encoding e ByteString) => e ByteString -> Double
+rankString :: (Encoding e) => e -> Double
 rankString s = (/l) . sum . fmap rankChar . S.unpack $ bs
     where l  = fromIntegral . S.length $ bs
           bs = toRaw s
 
-bestStringBy :: (Encoding e ByteString) => (a -> e ByteString) -> [a] -> a
+bestStringBy :: (Encoding e) => (a -> e) -> [a] -> a
 bestStringBy f = fst . maximumBy (comparing snd) . fmap (identity &&& rankString . f)
 
-bestString :: (Encoding e ByteString) => [e ByteString] -> e ByteString
+bestString :: (Encoding e) => [e] -> e
 bestString = bestStringBy identity
 
 hammingDistance :: Bits e => e -> e -> Int

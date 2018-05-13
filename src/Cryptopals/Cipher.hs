@@ -39,18 +39,18 @@ instance Random BlockSize where
 
 data IV = IV BlockSize ByteString deriving (Read, Show, Eq)
 
-iv :: Raw b => BlockSize -> b -> IV
-iv bs s | S.length raw > bytes = error . toS $ "iv is too big for " ++ show bs
+iv :: Encoding b => BlockSize -> b -> IV
+iv bs s | S.length raw > bytes = panic . toS $ "iv is too big for " ++ show bs
         | otherwise            = IV bs $ pkcs7BS bytes raw
     where
     bytes = blockBytes bs
-    raw   = toByteString s
+    raw   = toRaw s
 
 zeroIv :: BlockSize -> IV
 zeroIv bs = IV bs $ S.replicate (blockBytes bs) '\x00'
 
-encodeIv :: Encoding e b => IV -> e b
-encodeIv (IV _ b) = fromByteString b
+encodeIv :: Encoding e => IV -> e
+encodeIv (IV _ b) = fromRaw b
 
 data Mode = ECB | CBC IV deriving (Read, Show, Eq)
 
@@ -61,18 +61,18 @@ blockBytes B256 = 32
 type CipherFunction e = Key -> e -> e
 
 data Cipher e = Cipher
-    { encrypt :: Encoding e ByteString => CipherFunction (e ByteString)
-    , decrypt :: Encoding e ByteString => CipherFunction (e ByteString)
+    { encrypt :: Encoding e => CipherFunction e
+    , decrypt :: Encoding e => CipherFunction e
     }
 
-xorCipher :: Encoding e ByteString => Cipher e
+xorCipher :: Encoding e => Cipher e
 xorCipher = Cipher f f
     where
     f key e = onRaw (xor $ pad key e) e
     rawLen  = fromIntegral . S.length . toRaw
     pad k e = L.toStrict . L.take (rawLen e) . L.cycle $ L.fromStrict k
 
-aes :: Encoding e ByteString => Mode -> BlockSize -> Cipher e
+aes :: Encoding e => Mode -> BlockSize -> Cipher e
 aes ECB bs = Cipher{..}
     where
     encrypt = doAES ecbEncrypt bs
@@ -95,9 +95,9 @@ aes (CBC iv) bs = Cipher{..}
                        | (_,b) <- pipeline
                        ]
 
-doAES :: Encoding e ByteString
+doAES :: Encoding e
       => (forall c. Crypto.BlockCipher c => c -> ByteString -> ByteString)
-      -> BlockSize -> CipherFunction (e ByteString)
+      -> BlockSize -> CipherFunction e
 doAES f bs k = crypt . pkcs7 bytes
     where
     key   :: Crypto.BlockCipher bc => bc
@@ -111,5 +111,5 @@ pkcs7BS :: Int -> ByteString -> ByteString
 pkcs7BS n b = let l = (n - (S.length b `rem` n)) `rem` n
     in S.append b $ S.replicate l (chr l)
 
-pkcs7 :: (Encoding e ByteString) => Int -> e ByteString -> e ByteString
+pkcs7 :: Encoding e => Int -> e -> e
 pkcs7 n = onRaw $ pkcs7BS n
