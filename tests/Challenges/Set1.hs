@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 module Main where
 
 import Protolude
@@ -20,7 +21,7 @@ set1 = testGroup "Cryptopals crypto challenges - Set 1"
             , "20627261696e206c696b65206120706f"
             , "69736f6e6f7573206d757368726f6f6d"
             ])
-        @=? (Base64 $ S.concat
+        @?= (Base64 $ S.concat
             [ "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBs"
             , "aWtlIGEgcG9pc29ub3VzIG11c2hyb29t"
             ])
@@ -28,26 +29,26 @@ set1 = testGroup "Cryptopals crypto challenges - Set 1"
     , testCase "Challenge 2 - Fixed XOR" $
             Hex "1c0111001f010100061a024b53535009181c"
         -^- Hex "686974207468652062756c6c277320657965"
-        @=? Hex "746865206b696420646f6e277420706c6179"
+        @?= Hex "746865206b696420646f6e277420706c6179"
 
     , testCase "Challenge 3 - Break single-character XOR" $
         second ascii <$> bruteforceXor 1 (Hex $ S.concat
             [ "1b37373331363f78151b7f2b783431333d"
             , "78397828372d363c78373e783a393b3736"
             ])
-        @=? Just ("X", Ascii "Cooking MC's like a pound of bacon")
+        @?= Just ("X", Ascii "Cooking MC's like a pound of bacon")
 
     , testCase "Challenge 4 - Detect single-character XOR" $ do
         cts <- curlHexLines "https://cryptopals.com/static/challenge-data/4.txt"
         (second ascii $ bestBruteforceXor cts)
-            @=? ("5", Ascii "Now that the party is jumping\n")
+            @?= ("5", Ascii "Now that the party is jumping\n")
 
     , testCase "Challenge 5 - Implement repeating-key XOR" $
-        xorCipher "ICE" (hex . Ascii . S.concat $
+        encrypt xorCipher "ICE" (hex . Ascii . S.concat $
             [ "Burning 'em, if you ain't quick and nimble\n"
             , "I go crazy when I hear a cymbal"
             ])
-        @=? (Hex $ S.concat
+        @?= (Hex $ S.concat
             [ "0b3637272a2b2e63622c2e69692a23693a2a3"
             , "c6324202d623d63343c2a2622632427276527"
             , "2a282b2f20430a652e2c652a3124333a653e2"
@@ -61,13 +62,13 @@ set1 = testGroup "Cryptopals crypto challenges - Set 1"
 
     , testCase "Challenge 7 - AES in ECB mode" $ do
         ct <- curlBase64File "https://cryptopals.com/static/challenge-data/7.txt"
-        aes128DecryptECB "YELLOW SUBMARINE" ct
-            @=? base64 (pkcs7 (blockBytes B128) vanillaIcePlayThatFunkyMusic)
+        decrypt (aes ECB B128) "YELLOW SUBMARINE" ct
+            @?= base64 (pkcs7 (blockBytes B128) vanillaIcePlayThatFunkyMusic)
 
     , testCase "Challenge 8 - Detect AES in ECB mode" $ do
         cts <- curlBase64Lines "https://cryptopals.com/static/challenge-data/8.txt"
         length (findPossible128ECB cts)
-            @=? 1
+            @?= 1
     ]
 
 vanillaIcePlayThatFunkyMusic :: Ascii ByteString

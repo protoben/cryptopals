@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -24,7 +25,12 @@ class Raw b where
     onByteString f = fromByteString . f . toByteString
     opByteString :: (ByteString -> ByteString -> ByteString) -> b -> b -> b
     opByteString op e f = fromByteString $ toByteString e `op` toByteString f
+    apByteString :: (ByteString -> a) -> b -> a
+    apByteString f = f . toByteString
     {-# MINIMAL toByteString, fromByteString #-}
+instance {-# OVERLAPPABLE #-} Raw b => Monoid b where
+    mempty  = fromByteString ""
+    mappend = opByteString mappend
 
 instance Raw ByteString where
     toByteString = identity
@@ -37,10 +43,12 @@ class Raw b => Encoding e b where
     onRaw f = fromRaw . f . toRaw
     opRaw :: (b -> b -> b) -> e b -> e b -> e b
     opRaw op e f = fromRaw $ toRaw e `op` toRaw f
+    apRaw :: (b -> a) -> e b -> a
+    apRaw f = f . toRaw
     convert :: Encoding f b => e b -> f b
     convert = fromRaw . toRaw
     {-# MINIMAL toRaw, fromRaw #-}
-instance (Encoding e b) => Raw (e b) where
+instance Encoding e b => Raw (e b) where
     toByteString = toByteString . toRaw
     fromByteString = fromRaw . fromByteString
 

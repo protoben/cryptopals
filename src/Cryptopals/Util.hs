@@ -4,6 +4,7 @@ module Cryptopals.Util where
 
 import Protolude
 
+import Crypto.Error (CryptoFailable(..))
 import qualified Data.ByteString.Char8 as S
 import Data.Bits.ByteString ()
 
@@ -35,3 +36,7 @@ average l = sum l / (fromIntegral . length) l
 
 averageIntegrals :: (Integral i, Fractional f) => [i] -> f
 averageIntegrals = average . fmap fromIntegral
+
+assumeSuccess :: CryptoFailable a -> a
+assumeSuccess (CryptoPassed a) = a
+assumeSuccess (CryptoFailed e) = error $ show e
